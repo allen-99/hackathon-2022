@@ -4,3 +4,5 @@ flask_wtf
 wtforms
 flask_sqlalchemy
 flask_migrate
+flask-jwt-extended
+PyJWT

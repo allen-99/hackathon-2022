@@ -7,6 +7,8 @@ class Book(db.Model):
     description = db.Column(db.String)
     min_age = db.Column(db.Integer)
     year = db.Column(db.Integer)
+    link = db.Column(db.String)
+    cover_url = db.Column(db.String)
 
 
 class Genre(db.Model):
