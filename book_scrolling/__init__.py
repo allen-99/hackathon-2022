@@ -24,6 +24,9 @@ def create_app():
     from book_scrolling.routes.auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
 
+    from book_scrolling.routes.book_request import book_req as book_req_blueprint
+    app.register_blueprint(book_req_blueprint)
+
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
