@@ -24,20 +24,21 @@ def get_card_batch(n):
 
 
 def get_book_dict_by_id(book_id: int):
-    tags = []
-    select_tags = db.session.execute(select(Tag.name).join(Book_Tag).where(Book_Tag.book_id == book_id)).all()
+    tags = {}
+    select_tags = db.session.execute(
+        select(Tag.name, Tag.id).join(Book_Tag).where(Book_Tag.book_id == book_id)).all()
     for sel in select_tags:
-        tags.append(sel.name)
-    authors = []
+        tags[sel.id] = sel.name
+    authors = {}
     select_authors = db.session.execute(
-        select(Author.name).join(Book_Author).where(Book_Author.book_id == book_id)).all()
+        select(Author.name, Author.id).join(Book_Author).where(Book_Author.book_id == book_id)).all()
     for sel in select_authors:
-        authors.append(sel.name)
-    genres = []
+        authors[sel.id] = sel.name
+    genres = {}
     select_genres = db.session.execute(
-        select(Genre.name).join(Book_Genre).where(Book_Genre.book_id == book_id)).all()
+        select(Genre.name, Genre.id).join(Book_Genre).where(Book_Genre.book_id == book_id)).all()
     for sel in select_genres:
-        genres.append(sel.name)
+        genres[sel.id] = sel.name
 
     book = Book.query.filter_by(id=book_id).first()
     return {
@@ -61,7 +62,7 @@ class CardType(enum.Enum):
 # session
 # - name = string : {
 # - - already_seen = set(book_id, book_id, ...)
-# - - queue = [(card_id, CardType), (card_id, CardType), ...] }
+# - - queue = [(card_id, CardType, {genres, authors, tags}), (card_id, CardType, {genres, authors, tags}), ...] }
 
 
 sessions = dict()
@@ -84,6 +85,27 @@ def get_card_queue():
 
 def update_weights(json):
     queue_info = sessions[json['name']]['queue']
+    for yes_answer_index in json['yes']:
+        for genre in queue_info[yes_answer_index][2]['genres']:
+            print(f'yes -> {genre}')
+        for author in queue_info[yes_answer_index][2]['authors']:
+            print(f'yes -> {author}')
+        for tag in queue_info[yes_answer_index][2]['tags']:
+            print(f'yes -> {tag}')
+    for no_answer_index in json['no']:
+        for genre in queue_info[no_answer_index][2]['genres']:
+            print(f'no -> {genre}')
+        for author in queue_info[no_answer_index][2]['authors']:
+            print(f'no -> {author}')
+        for tag in queue_info[no_answer_index][2]['tags']:
+            print(f'no -> {tag}')
+    for save_answer_index in json['save']:
+        for genre in queue_info[save_answer_index][2]['genres']:
+            print(f'save -> {genre}')
+        for author in queue_info[save_answer_index][2]['authors']:
+            print(f'save -> {author}')
+        for tag in queue_info[save_answer_index][2]['tags']:
+            print(f'save -> {tag}')
 #   ужасно неоптимизированный запрос
 
 
@@ -98,14 +120,18 @@ def update_already_seen(json):
 def update_queue(name):
     n = 5
     seen_set = sessions[name]['already_seen']
-    # select id form book where id not in
     books = Book.query.filter(Book.id.not_in(seen_set)).limit(n).all()
     sessions[name]['queue'] = []
     selected_books = []
     for book in books:
         book_id = book.id
-        sessions[name]['queue'].append((book_id, CardType.book))
-        selected_books.append(get_book_dict_by_id(book_id))
+        book_info = get_book_dict_by_id(book_id)
+        sessions[name]['queue'].append((book_id, CardType.book, {
+            'genres': book_info['genres'],
+            'tags': book_info['tags'],
+            'authors': book_info['authors']
+        }))
+        selected_books.append(book_info)
 
     return jsonify(selected_books)
 
@@ -117,8 +143,13 @@ def start_queue(name):
     }
     selected_books = []
     for book_id in range(5):
-        sessions[name]['queue'].append((book_id, CardType.book))
-        selected_books.append(get_book_dict_by_id(book_id))
+        book_info = get_book_dict_by_id(book_id)
+        sessions[name]['queue'].append((book_id, CardType.book, {
+            'genres': book_info['genres'],
+            'tags': book_info['tags'],
+            'authors': book_info['authors']
+        }))
+        selected_books.append(book_info)
 
     return jsonify(selected_books)
 
