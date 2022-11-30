@@ -1,10 +1,10 @@
 import React from 'react';
 
-const WillRead = () => {
+const WillRead = ({add}) => {
     return (
-        <div className={'h-[50px] grid mt-3'}>
+        <div className={'top_panel grid mt-3 text-grey-100 font-normal text-xs '} onClick={add}>
             <img src={'./card/read_arrow.svg'} className={'mx-auto'}/>
-            <div>Сохранить</div>
+            <div className={'mt-1'}>Сохранить</div>
         </div>
     );
 };

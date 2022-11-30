@@ -5,9 +5,9 @@ import {BrowserRouter, Routes, Route}
 
 import Home from './pages/Home';
 import SignUp from './pages/SignUp';
-import Login from './pages/Login';
 
 import NavBar from "./components/NavBar";
+import Favourite from "./pages/Favourite";
 
 
 const Main = () => {
@@ -16,7 +16,7 @@ const Main = () => {
             <NavBar/>
             <Routes>
                 <Route exact path='/' element={<Home />}/>
-                <Route path='/login' element={<Login />}/>
+                <Route path='/collection' element={<Favourite />}/>
                 <Route path='/sign-up' element={<SignUp/>}/>
             </Routes>
         </BrowserRouter>
