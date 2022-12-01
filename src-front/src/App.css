@@ -1,0 +1,123 @@
+@import url('https://fonts.cdnfonts.com/css/bebas-neue');
+
+html,
+body,
+.wrapper {
+  text-align: center;
+  background: #FAF8F2;
+  overflow: hidden;
+  height: 100%;
+}
+
+.button {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #8C8775;
+}
+
+@keyframes move_up {
+  from {
+    transform : scale(1) translateY(0em);
+    opacity   : 1;
+  }
+  100% {
+    transform : scale(0.80) translateY(-20em);
+    opacity   : 0;
+  }
+  to {
+    opacity   : 0;
+  }
+}
+
+@keyframes move_down {
+  from {
+    transform : scale(1) translateY(0em);
+    opacity   : 1;
+  }
+  100% {
+    transform : scale(0.80) translateY(20em);
+    opacity   : 0;
+  }
+  to {
+    opacity   : 0;
+  }
+}
+
+@keyframes move_right {
+  from {
+    transform : scale(1) translateX(0em);
+    opacity   : 1;
+  }
+  100% {
+    transform : scale(0.80) translateX(20em);
+    opacity   : 0;
+  }
+  to {
+    opacity   : 0;
+  }
+}
+
+@keyframes move_left {
+  from {
+    transform : scale(1) translateX(0em);
+    opacity   : 1;
+  }
+  100% {
+    transform : scale(0.80) translateX(-20em);
+    opacity   : 0;
+  }
+  to {
+    opacity   : 0;
+  }
+}
+
+.moveup {
+  animation: move_up 1s ;
+}
+
+.movedown {
+  animation: move_down 1s ;
+}
+
+.moveright {
+  animation: move_right 1s ;
+}
+
+.moveleft {
+  animation: move_left 1s ;
+}
+
+.card_place {
+  left: calc(50% - 152px);
+}
+
+.card_place_top {
+  top: calc(33% - 250px);
+  top:-webkit-calc(33% - 250px);
+  top:-moz-calc(33% - 260px);
+}
+
+.top_panel {
+  top: calc(10% - 10px);
+  top:-webkit-calc(10% - 10px);
+  top:-moz-calc(10% - 10px);
+}
+
+.shadow {
+  box-shadow: 20px 20px 20px 40px #33322E;
+}
+
+.font-article {
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+a:link { text-decoration: none; }
+
+
+a:visited { text-decoration: none; }
+
+
+a:hover { text-decoration: none; }
+
+
+a:active { text-decoration: none; }

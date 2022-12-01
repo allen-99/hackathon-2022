@@ -10,9 +10,25 @@ const Companion = () => {
             name: 'Лёша Бураков',
             power: 'Дизайнер',
             tgLink: 'https://t.me/AlexeyBurakov',
-            photo: '//link',
+            photo: './user/we/lesha.png',
             favBooks: ['Десять негритят'],
             favTags: ['Детективы','Исторический роман','Фэнтези','Экранизация'],
+        },
+        {
+            name: 'Саша Ильченко',
+            power: 'Программист',
+            tgLink: 'https://t.me/Aight99',
+            photo: './user/we/sasha.png',
+            favBooks: ['Показания Рэндольфа Картера'],
+            favTags: ['Зарубежная литература','Ужасы','Мистика','Экранизация'],
+        },
+        {
+            name: 'Наташа Крючкова',
+            power: 'Программист',
+            tgLink: 'https://t.me/allen99',
+            photo: './user/we/natasha.png',
+            favBooks: ['451 градус по Фаренгейту'],
+            favTags: ['Зарубежная фантастика','Роман','Зарубежная классика','Антиутопия'],
         }
     ]
     return (
@@ -29,7 +45,7 @@ const Companion = () => {
             <div className={'mt-8 flex'}>
                 <div className="avatar">
                     <div className="w-24 rounded-full">
-                        <img src="https://placeimg.com/192/192/people"/>
+                        <img src={equivocals[0].photo}/>
                     </div>
                 </div>
                 <div className={'ml-3 self-center'}>

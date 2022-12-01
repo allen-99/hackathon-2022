@@ -10,21 +10,31 @@ import Favourite from "./pages/Favourite";
 import Companion from "./components/Companion";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
+import Start from "./components/Start";
 
 
 const Main = () => {
     return (
-        <BrowserRouter>
-            <NavBar/>
-            <Routes>
-                <Route exact path='/' element={<Home />}/>
-                <Route path='/collection' element={<Favourite />}/>
-                <Route path='/companion' element={<Companion />}/>
+        <>
+            <BrowserRouter>
+                { window.location.pathname !== '/' && <NavBar/>}
+                { window.location.pathname !== '/login' && <NavBar/>}
+                { window.location.pathname !== '/signup' && <NavBar/>}
+                <Routes>
+                    <Route path='/collection' element={<Favourite />}/>
+                    <Route path='/companion' element={<Companion />}/>
+                    <Route path='/cards' element={<Home />}/>
+                </Routes>
+            </BrowserRouter>
+            <BrowserRouter>
+                <Routes>
+                    <Route exact path='/' element={<Start />}/>
+                    <Route path='/login' element={<Login />}/>
+                    <Route path='/signup' element={<SignUp />}/>
+                </Routes>
+            </BrowserRouter>
+        </>
 
-                <Route path='/login' element={<Login />}/>
-                <Route path='/signup' element={<SignUp />}/>
-            </Routes>
-        </BrowserRouter>
     );
 };
 
