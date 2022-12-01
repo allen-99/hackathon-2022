@@ -5,6 +5,7 @@ from sqlalchemy import select, func
 
 from book_scrolling import db
 from book_scrolling.models.book import Book, Book_Genre, Book_Tag, Book_Author, Tag, Genre, Author
+from book_scrolling.models.session import User_Book
 
 book_req = Blueprint('book_req', __name__)
 
@@ -161,3 +162,27 @@ def get_card_queue(n):
 def reset_session(name):
     sessions.pop(name, None)
     return f"{name}, you're clean"
+
+
+@book_req.route('/save_book/<int:book_id>', methods=['POST'])
+def save_book(book_id):
+    save = User_Book(user_id=1, book_id=book_id)
+    db.session.add(save)
+    db.session.commit()
+    return 'Ok'
+
+
+@book_req.route('/get_savings', methods=['GET'])
+def get_savings():
+    books = User_Book.query.all()
+    savings = []
+    for book in books:
+        savings.append(get_book_dict_by_id(book.book_id))
+    return jsonify(savings)
+
+
+@book_req.route('/delete_save/<int:book_id>', methods=['DELETE'])
+def delete_save(book_id):
+    User_Book.query.filter_by(user_id=1, book_id=book_id).delete()
+    db.session.commit()
+    return 'Ok'
