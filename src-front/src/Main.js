@@ -4,10 +4,12 @@ import {BrowserRouter, Routes, Route}
 
 
 import Home from './pages/Home';
-import SignUp from './pages/SignUp';
 
 import NavBar from "./components/NavBar";
 import Favourite from "./pages/Favourite";
+import Companion from "./components/Companion";
+import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
 
 
 const Main = () => {
@@ -17,7 +19,10 @@ const Main = () => {
             <Routes>
                 <Route exact path='/' element={<Home />}/>
                 <Route path='/collection' element={<Favourite />}/>
-                <Route path='/sign-up' element={<SignUp/>}/>
+                <Route path='/companion' element={<Companion />}/>
+
+                <Route path='/login' element={<Login />}/>
+                <Route path='/signup' element={<SignUp />}/>
             </Routes>
         </BrowserRouter>
     );
