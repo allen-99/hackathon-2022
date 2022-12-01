@@ -1,7 +1,7 @@
 import enum
 
 from flask import Blueprint, request, jsonify
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from book_scrolling import db
 from book_scrolling.models.book import Book, Book_Genre, Book_Tag, Book_Author, Tag, Genre, Author
@@ -88,13 +88,56 @@ class SwipeSession:
                 self.already_seen.add(seen_card['id'])
 
     def update_queue(self, n=5):
-        books = Book.query.filter(Book.id.not_in(self.already_seen)).limit(n).all()
+        books, authors, genres, tags = self.get_recommended_books(n)
         selected_books = []
-        for book in books:
-            book_id = book.id
-            book_info = get_book_dict_by_id(book_id)
-            selected_books.append(book_info)
+        for i, book in enumerate(books):
+            selected_books.append({
+                "id": book[0],
+                "title": book[1],
+                "description": book[2],
+                "link": book[3],
+                "cover_url": book[4],
+                "authors": authors[i],
+                "genres": genres[i],
+                "tags": tags[i],
+                "card_type": CardType.book
+            })
         self.queue = selected_books
+
+    def get_recommended_books(self, n=5):
+
+        books = db.session.execute(
+            select(Book.id, Book.title, Book.description, Book.link, Book.cover_url)
+            .where(Book.id.not_in(self.already_seen))
+            .order_by(func.random())
+            .limit(n)
+        ).all()
+
+        books_authors = []
+        books_genres = []
+        books_tags = []
+        for book in books:
+            book_id = book[0]
+            tags = {}
+            select_tags = db.session.execute(
+                select(Tag.name, Tag.id).join(Book_Tag).where(Book_Tag.book_id == book_id)).all()
+            for sel in select_tags:
+                tags[sel.id] = sel.name
+            books_tags.append(tags)
+            authors = {}
+            select_authors = db.session.execute(
+                select(Author.name, Author.id).join(Book_Author).where(Book_Author.book_id == book_id)).all()
+            for sel in select_authors:
+                authors[sel.id] = sel.name
+            books_authors.append(authors)
+            genres = {}
+            select_genres = db.session.execute(
+                select(Genre.name, Genre.id).join(Book_Genre).where(Book_Genre.book_id == book_id)).all()
+            for sel in select_genres:
+                genres[sel.id] = sel.name
+            books_genres.append(genres)
+
+        return books, books_authors, books_genres, books_tags
 
 
 @book_req.route('/get_cards', defaults={'n': 5}, methods=['POST'])
@@ -103,7 +146,6 @@ def get_card_queue(n):
     params = request.get_json()
     name = params['name']
     session = get_session(name)
-    print('aaa')
     if len(params) == 1:
         queue_json = jsonify(session.queue)
     else:
