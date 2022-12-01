@@ -9,15 +9,6 @@ from book_scrolling.models.book import Book, Book_Genre, Book_Tag, Book_Author, 
 book_req = Blueprint('book_req', __name__)
 
 
-@book_req.route('/get_cards/<int:n>', methods=['POST'])
-def get_card_batch(n):
-    result = []
-    for i in range(int(n)):
-        book_id = i
-        result.append(get_book_dict_by_id(book_id))
-    return jsonify(result)
-
-
 def get_book_dict_by_id(book_id: int):
     tags = {}
     select_tags = db.session.execute(
@@ -37,6 +28,7 @@ def get_book_dict_by_id(book_id: int):
 
     book = Book.query.filter_by(id=book_id).first()
     return {
+        "id": book_id,
         "title": book.title,
         "description": book.description,
         "link": book.link,
@@ -44,10 +36,11 @@ def get_book_dict_by_id(book_id: int):
         "authors": authors,
         "genres": genres,
         "tags": tags,
+        "card_type": CardType.book
     }
 
 
-class CardType(enum.Enum):
+class CardType(enum.IntEnum):
     book = 1
     bonus = 2
 
@@ -72,7 +65,6 @@ class SwipeSession:
     def __init__(self, username):
         self.username = username
         self.already_seen = set()
-        self.queue_info = []
         self.author_weights = dict()
         self.genre_weights = dict()
         self.tag_weights = dict()
@@ -84,72 +76,40 @@ class SwipeSession:
         selected_books = []
         for book_id in range(5):
             book_info = get_book_dict_by_id(book_id)
-            self.queue_info.append((book_id, CardType.book, {
-                'genres': book_info['genres'],
-                'tags': book_info['tags'],
-                'authors': book_info['authors']
-            }))
             selected_books.append(book_info)
         self.queue = selected_books
 
     def update_weights(self, json):
-        for yes_answer_index in json['yes']:
-            for genre in self.queue_info[yes_answer_index][2]['genres']:
-                print(f'yes -> {genre}')
-            for author in self.queue_info[yes_answer_index][2]['authors']:
-                print(f'yes -> {author}')
-            for tag in self.queue_info[yes_answer_index][2]['tags']:
-                print(f'yes -> {tag}')
-        for no_answer_index in json['no']:
-            for genre in self.queue_info[no_answer_index][2]['genres']:
-                print(f'no -> {genre}')
-            for author in self.queue_info[no_answer_index][2]['authors']:
-                print(f'no -> {author}')
-            for tag in self.queue_info[no_answer_index][2]['tags']:
-                print(f'no -> {tag}')
-        for save_answer_index in json['save']:
-            for genre in self.queue_info[save_answer_index][2]['genres']:
-                print(f'save -> {genre}')
-            for author in self.queue_info[save_answer_index][2]['authors']:
-                print(f'save -> {author}')
-            for tag in self.queue_info[save_answer_index][2]['tags']:
-                print(f'save -> {tag}')
-    #   ужасно неоптимизированный запрос
+        pass
 
-    def update_already_seen(self, json):
-        for queue_index in json['yes'] + json['no'] + json['save']:
-            if self.queue_info[queue_index][1] == CardType.book:
-                self.already_seen.add(self.queue_info[queue_index][0])
+    def update_already_seen(self):
+        for seen_card in self.queue:
+            if seen_card['card_type'] == CardType.book:
+                self.already_seen.add(seen_card['id'])
 
-    def update_queue(self):
-        n = 5
+    def update_queue(self, n=5):
         books = Book.query.filter(Book.id.not_in(self.already_seen)).limit(n).all()
-        self.queue_info = []
         selected_books = []
         for book in books:
             book_id = book.id
             book_info = get_book_dict_by_id(book_id)
-            self.queue_info.append((book_id, CardType.book, {
-                'genres': book_info['genres'],
-                'tags': book_info['tags'],
-                'authors': book_info['authors']
-            }))
             selected_books.append(book_info)
         self.queue = selected_books
 
 
-@book_req.route('/get_cards', methods=['POST'])
-def get_card_queue():
+@book_req.route('/get_cards', defaults={'n': 5}, methods=['POST'])
+@book_req.route('/get_cards/<n>', methods=['POST'])
+def get_card_queue(n):
     params = request.get_json()
     name = params['name']
     session = get_session(name)
-
-    if len(session.queue) != 0:
+    print('aaa')
+    if len(params) == 1:
         queue_json = jsonify(session.queue)
     else:
         # session.update_weights(params)
         session.update_already_seen()
-        session.update_queue()
+        session.update_queue(n)
         queue_json = jsonify(session.queue)
 
     return queue_json
