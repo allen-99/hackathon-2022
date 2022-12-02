@@ -45,3 +45,11 @@ class Book_Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
     tag_id = db.Column(db.Integer,  db.ForeignKey('tag.id'))
+
+
+class BonusCard(db.Model):
+    __tablename__ = "BonusCard"
+    id = db.Column(db.Integer, primary_key=True)
+    genre_id = db.Column(db.Integer)
+    title = db.Column(db.String)
+    cover_url = db.Column(db.String)
