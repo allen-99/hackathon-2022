@@ -27,18 +27,21 @@ class Tag(db.Model):
 
 
 class Book_Genre(db.Model):
+    __tablename__ = "BookGenre"
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
     genre_id = db.Column(db.Integer,  db.ForeignKey('genre.id'))
 
 
 class Book_Author(db.Model):
+    __tablename__ = "BookAuthor"
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
     author_id = db.Column(db.Integer,  db.ForeignKey('author.id'))
 
 
 class Book_Tag(db.Model):
+    __tablename__ = "BookTag"
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
     tag_id = db.Column(db.Integer,  db.ForeignKey('tag.id'))
