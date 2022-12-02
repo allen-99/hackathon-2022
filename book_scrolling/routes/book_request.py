@@ -1,4 +1,5 @@
 import enum
+import json
 
 from flask import Blueprint, request, jsonify
 from sqlalchemy import select, func
@@ -183,6 +184,23 @@ class SwipeSession:
 @book_req.route('/get_cards/<n>', methods=['POST'])
 def get_card_queue(n):
     params = request.get_json()
+    name = params['name']
+    session = get_session(name)
+    if len(params) == 1:
+        queue_json = jsonify(session.queue)
+    else:
+        # session.update_weights(params)
+        session.update_bookmarks(params)
+        session.update_already_seen()
+        session.update_queue(n)
+        queue_json = jsonify(session.queue)
+
+    return queue_json
+
+
+@book_req.route('/get_cards/<int:n>/<json_params>', methods=['GET'])
+def get_card_queue_hack(n, json_params):
+    params = json.loads(json_params)
     name = params['name']
     session = get_session(name)
     if len(params) == 1:
