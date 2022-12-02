@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -6,6 +7,7 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
+
 
 
 def create_app():
@@ -29,6 +31,10 @@ def create_app():
 
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
+
+    scope = Flask(__name__, static_url_path='')
+    # пришлось добавить эту штуку чтобы решить проблему с blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+    CORS(scope)
 
     @login_manager.user_loader
     def load_user(id):

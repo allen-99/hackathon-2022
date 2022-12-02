@@ -7,8 +7,8 @@ const Login = () => {
         let path = `/signup`;
         navigate(path);
     }
-    const toPassword = () =>{
-        let path = `/password`;
+    const toCard = () =>{
+        let path = `/home`;
         navigate(path);
     }
 
@@ -33,9 +33,16 @@ const Login = () => {
                            p-0 rounded-0 bg-transparent  text-grey-100"/>
 
                 </div>
+                <div className={'text-xl pt-4'}>Пароль</div>
+                <div className={'border-b-[1px] border-grey-100 mt-2'}>
+                    <input type="text"
+                           placeholder="Введите пароль"
+                           className="input input-ghost w-full h-7 max-w-xs
+                           p-0 rounded-0 bg-transparent  text-grey-100"/>
+                </div>
             </div>
             <div className={'mt-6 flex'}>
-                <div className={'px-10 py-[12px] rounded-xl w-max bg-yellow'} onClick={toPassword}>
+                <div className={'px-10 py-[12px] rounded-xl w-max bg-yellow'} onClick={toCard}>
                     <p className={'text-start text-base font-medium text-black m-0'}>Продолжить</p>
                 </div>
                 <div className={'flex gap-2 ml-4 pt-1'}>

@@ -27,15 +27,16 @@ const Main = () => {
                 <Routes>
                     <Route path='/collection' element={<Favourite />}/>
                     <Route path='/companion' element={<Companion />}/>
-                    <Route path='/cards' element={<Home />}/>
-                </Routes>
-            </BrowserRouter>
-            <BrowserRouter>
-                <Routes>
+                    <Route path='/home' element={<Home />}/>
                     <Route exact path='/' element={<Start />}/>
                     <Route path='/login' element={<Login />}/>
                     <Route path='/signup' element={<SignUp />}/>
                     <Route path='/password' element={<Password />}/>
+                </Routes>
+            </BrowserRouter>
+            <BrowserRouter>
+                <Routes>
+
                 </Routes>
             </BrowserRouter>
         </>

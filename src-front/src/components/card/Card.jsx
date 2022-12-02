@@ -3,7 +3,7 @@ import {Card} from "react-bootstrap";
 import CardImg from "./CardImg";
 // import cover from './covers/cover.jpg'
 
-const CustomCard = ({author, title, createNewCard, zindex, id='1'}) => {
+const CustomCard = ({author, title, createNewCard, zindex, id='1', link, cover}) => {
     const [beginX, setBeginX] = useState(0)
     const [beginY, setBeginY] = useState(0)
 
@@ -71,7 +71,7 @@ const CustomCard = ({author, title, createNewCard, zindex, id='1'}) => {
                   onTouchEnd={(event) =>  endTouch(event)}
                   onTouchMove={() => moveTouch()}
             >
-                <CardImg />
+                <CardImg cover={cover} />
                 <Card.ImgOverlay className={'content-end grid'}>
                     <Card.Text className={'text-yellow text-left m-0 pl-1'}>{author}</Card.Text>
                     <Card.Text className={'text-white-200 text-left m-0 pl-1'}>{title}</Card.Text>
