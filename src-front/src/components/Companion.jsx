@@ -1,10 +1,14 @@
-import React from 'react';
+import React, {useState} from 'react';
 import FavCard from "./favourite/FavCard";
 import BookTag from "./favourite/BookTag";
 import TagModalFavCard from "./favourite/TagModalFavCard";
 import TelegramButton from "./TelegramButton";
 
 const Companion = () => {
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
     const equivocals = [
         {
             name: 'Лёша Бураков',
@@ -31,6 +35,7 @@ const Companion = () => {
             favTags: ['Зарубежная фантастика','Роман','Зарубежная классика','Антиутопия'],
         }
     ]
+    const [num, setNum] = useState(getRandomInt(3))
     return (
 
         <div className={'pt-10 px-7 place-content-start text-start bg-white-200 h-full'}>
@@ -45,27 +50,27 @@ const Companion = () => {
             <div className={'mt-8 flex'}>
                 <div className="avatar">
                     <div className="w-24 rounded-full">
-                        <img src={equivocals[0].photo}/>
+                        <img src={equivocals[num].photo}/>
                     </div>
                 </div>
                 <div className={'ml-3 self-center'}>
-                    <div className={'text-xl'}>{equivocals[0].name}</div>
-                    <div>{equivocals[0].power}</div>
+                    <div className={'text-xl'}>{equivocals[num].name}</div>
+                    <div>{equivocals[num].power}</div>
                 </div>
             </div>
             <div className={'mt-4 gap-1 flex flex-wrap'}>
-                {equivocals[0].favBooks.map((book) => (
+                {equivocals[num].favBooks.map((book) => (
                     <BookTag title={book}/>
                 ))}
 
             </div>
             <div className={'gap-1 flex flex-wrap'}>
-                {equivocals[0].favTags.map((book) => (
+                {equivocals[num].favTags.map((book) => (
                     <TagModalFavCard title={book}/>
                 ))}
             </div>
             <div className={'grid justify-items-start mt-4'}>
-                <TelegramButton click={equivocals[0].tgLink} />
+                <TelegramButton click={equivocals[num].tgLink} />
             </div>
         </div>
 
