@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 from sqlalchemy import select, func
 
 from book_scrolling import db
-from book_scrolling.models.book import Book, Book_Genre, Book_Tag, Book_Author, Tag, Genre, Author
+from book_scrolling.models.book import Book, Book_Genre, Book_Tag, Book_Author, Tag, Genre, Author, BonusCard
 from book_scrolling.models.session import User_Book
 
 book_req = Blueprint('book_req', __name__)
@@ -48,8 +48,6 @@ class CardType(enum.IntEnum):
 
 @book_req.route('/test', methods=['POST'])
 def test_pd():
-    session = SwipeSession('tester')
-    print(session.queue)
     return '200'
 
 
@@ -63,22 +61,37 @@ def get_session(name: str):
 
 
 class SwipeSession:
+    CARS_TO_BONUS = 10
+
     def __init__(self, username):
         self.username = username
-        self.already_seen = set()
+        self.already_seen_book = set()
+        self.already_seen_bonus = set()
         self.author_weights = dict()
         self.genre_weights = dict()
         self.tag_weights = dict()
         self.queue = None
+        self.current_cards_to_bonus = self.CARS_TO_BONUS
         self.initialize_queue()
 
     def initialize_queue(self):
-        # Надо потом делать это бонусами
-        selected_books = []
-        for book_id in range(5):
-            book_info = get_book_dict_by_id(book_id)
-            selected_books.append(book_info)
-        self.queue = selected_books
+        n = 5
+        bonuses = db.session.execute(
+            select(BonusCard.id, BonusCard.title, BonusCard.cover_url)
+            .where(BonusCard.id.not_in(self.already_seen_bonus))
+            .order_by(func.random())
+            .limit(n)
+        ).all()
+        bonuses_json = []
+        for bonus in bonuses:
+            book_info = {
+                "id": bonus[0],
+                "title": bonus[1],
+                "cover_url": bonus[2],
+                "card_type": CardType.bonus
+            }
+            bonuses_json.append(book_info)
+        self.queue = bonuses_json
 
     def update_weights(self, json):
         pass
@@ -86,7 +99,9 @@ class SwipeSession:
     def update_already_seen(self):
         for seen_card in self.queue:
             if seen_card['card_type'] == CardType.book:
-                self.already_seen.add(seen_card['id'])
+                self.already_seen_book.add(seen_card['id'])
+            if seen_card['card_type'] == CardType.bonus:
+                self.already_seen_bonus.add(seen_card['id'])
 
     def update_queue(self, n=5):
         books, authors, genres, tags = self.get_recommended_books(n)
@@ -103,13 +118,15 @@ class SwipeSession:
                 "tags": tags[i],
                 "card_type": CardType.book
             })
+            self.current_cards_to_bonus -= 1
+        self.try_add_bonus(selected_books)
         self.queue = selected_books
 
     def get_recommended_books(self, n=5):
 
         books = db.session.execute(
             select(Book.id, Book.title, Book.description, Book.link, Book.cover_url)
-            .where(Book.id.not_in(self.already_seen))
+            .where(Book.id.not_in(self.already_seen_book))
             .order_by(func.random())
             .limit(n)
         ).all()
@@ -139,6 +156,22 @@ class SwipeSession:
             books_genres.append(genres)
 
         return books, books_authors, books_genres, books_tags
+
+    def try_add_bonus(self, selected_books):
+        if self.current_cards_to_bonus <= 0:
+            bonus = db.session.execute(
+                select(BonusCard.id, BonusCard.title, BonusCard.cover_url)
+                .where(BonusCard.id.not_in(self.already_seen_bonus))
+                .order_by(func.random())
+            ).first()
+            if bonus is not None:
+                selected_books.append({
+                    "id": bonus[0],
+                    "title": bonus[1],
+                    "cover_url": bonus[2],
+                    "card_type": CardType.bonus
+                })
+            self.current_cards_to_bonus = self.CARS_TO_BONUS
 
 
 @book_req.route('/get_cards', defaults={'n': 5}, methods=['POST'])
