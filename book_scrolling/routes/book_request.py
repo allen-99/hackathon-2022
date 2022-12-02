@@ -104,6 +104,10 @@ class SwipeSession:
             if seen_card['card_type'] == CardType.bonus:
                 self.already_seen_bonus.add(seen_card['id'])
 
+    def update_bookmarks(self, json):
+        for book_id in json['save']:
+            save_book(self.username, book_id)
+
     def update_queue(self, n=5):
         books, authors, genres, tags = self.get_recommended_books(n)
         selected_books = []
@@ -185,6 +189,7 @@ def get_card_queue(n):
         queue_json = jsonify(session.queue)
     else:
         # session.update_weights(params)
+        session.update_bookmarks(params)
         session.update_already_seen()
         session.update_queue(n)
         queue_json = jsonify(session.queue)
